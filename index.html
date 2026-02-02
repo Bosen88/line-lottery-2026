@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 馬上有錢新春抽抽樂</title>
+    <style>
+        /* CSS 樣式維持不變，保持喜氣 */
+        :root { --primary-red: #d93025; --primary-gold: #ffd700; }
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background-color: var(--primary-red);
+            background-image: radial-gradient(circle, #e64c4c 10%, transparent 10%);
+            background-size: 20px 20px;
+            color: #333;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            border: 4px solid var(--primary-gold);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .horse-deco { font-size: 3rem; margin-bottom: -10px; }
+        h1 { color: var(--primary-red); margin-bottom: 5px; font-weight: 800; font-size: 1.5rem; }
+        .sub-title { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
+        input[type="text"] { width: 80%; padding: 12px; font-size: 1rem; border: 2px solid #ddd; margin-bottom: 15px; text-align: center; border-radius: 8px;}
+        .btn-start { background: var(--primary-red); color: var(--primary-gold); border: none; padding: 12px 30px; font-size: 1.1rem; border-radius: 50px; cursor: pointer; font-weight: bold; }
+        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+        .card { background-color: var(--primary-gold); aspect-ratio: 1; border-radius: 8px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.6s; }
+        .card.flipped { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; padding: 5px; box-sizing: border-box; }
+        .card-front { background: linear-gradient(135deg, #ffeb3b 0%, #fbc02d 100%); color: #d93025; font-size: 2rem; border: 2px solid #fff; }
+        .card-back { background: #fff; color: #d93025; transform: rotateY(180deg); border: 2px solid var(--primary-gold); font-size: 0.9rem; }
+        .message-box { margin-top: 20px; padding: 10px; background: #ffebee; color: #c62828; border-radius: 8px; font-size: 0.9rem; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="horse-deco">🐎</div>
+    <h1>2026 馬上有錢<br>新春抽抽樂</h1>
+    <p class="sub-title">LINE 購物群友專屬活動</p>
+
+    <div id="login-section">
+        <p>請先輸入您的 LINE 暱稱</p>
+        <input type="text" id="nickname" placeholder="例如: 王小明">
+        <br>
+        <button class="btn-start" onclick="checkUser()">開始抽獎</button>
+    </div>
+
+    <div id="game-section" style="display:none;">
+        <p>請點擊任意一張牌！</p>
+        <div class="grid-container" id="grid"></div>
+        <div class="message-box" id="result-msg"></div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // 🔴🔴 請在此處貼上您從 Firebase Console 複製的設定 🔴🔴
+	const firebaseConfig = {
+ 	 apiKey: "AIzaSyD_VwNV9-pcv91aFfcWQWCJ0NJtSIKi42o",
+ 	 authDomain: "lottery-2026.firebaseapp.com",
+ 	 projectId: "lottery-2026",
+	 storageBucket: "lottery-2026.firebasestorage.app",
+	
+ 	 appId: "1:451105292594:web:ca1e74f3e88daae298972b"
+	};
+
+    // 初始化 Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let currentNickname = '';
+    let isProcessing = false;
+
+    window.checkUser = async function() {
+        const input = document.getElementById('nickname').value.trim();
+        if (!input) return alert('請輸入暱稱');
+        
+        currentNickname = input;
+        document.getElementById('login-section').innerHTML = '<p>讀取資料中...</p>';
+
+        try {
+            // 檢查是否抽過 (直接用暱稱當 ID，保證唯一)
+            const docRef = doc(db, "participants", currentNickname);
+            const docSnap = await getDoc(docRef);
+
+            renderGrid(); // 先畫格子
+
+            if (docSnap.exists()) {
+                // 已抽過 -> 顯示結果
+                const data = docSnap.data();
+                alert(`您已經參加過囉！結果是：${data.prize}`);
+                revealAll(data.prize);
+                showResult(data.prize, true);
+            } else {
+                // 沒抽過 -> 進入遊戲模式
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('game-section').style.display = 'block';
+            }
+        } catch (e) {
+            console.error(e);
+            alert('連線錯誤，請檢查網路');
+            location.reload();
+        }
+    }
+
+    window.doDraw = async function(index) {
+        if (isProcessing) return;
+        isProcessing = true;
+
+        // 定義獎項與機率 (前端邏輯)
+        const prizes = [
+            '獨家代理商品 9折卷', '獨家代理商品 9折卷', '獨家代理商品 95折卷',
+            '馬年行大運', '恭喜發財', '新春大吉', '馬上有錢', '心想事成', '萬事如意'
+        ];
+        // 隨機抽一個
+        const result = prizes[Math.floor(Math.random() * prizes.length)];
+
+        try {
+            // 寫入 Firebase (使用 setDoc 寫入，如果暱稱已存在會失敗或覆蓋，
+            // 但因為前面 checkUser 檢查過了，且我們相信 User 只是玩遊戲)
+            // 嚴謹一點可以用 Transaction，但這裡求簡單
+            await setDoc(doc(db, "participants", currentNickname), {
+                prize: result,
+                timestamp: serverTimestamp()
+            });
+
+            // 成功寫入後，翻牌
+            revealOne(index, result);
+            showResult(result, false);
+
+        } catch (e) {
+            alert('抽獎發生錯誤，請重試');
+            isProcessing = false;
+        }
+    }
+
+    function renderGrid() {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        for(let i=0; i<9; i++) {
+            let card = document.createElement('div');
+            card.className = 'card';
+            card.id = `card-${i}`;
+            card.onclick = () => doDraw(i);
+            card.innerHTML = `
+                <div class="card-face card-front">福</div>
+                <div class="card-face card-back">?</div>
+            `;
+            grid.appendChild(card);
+        }
+    }
+
+    function revealOne(index, prize) {
+        const card = document.getElementById(`card-${index}`);
+        card.querySelector('.card-back').innerText = prize;
+        card.classList.add('flipped');
+        
+        // 翻開其他的 (隨機填充)
+        setTimeout(() => {
+            const fillers = ['恭喜發財', '銘謝惠顧', '再接再厲', '馬年快樂'];
+            for(let i=0; i<9; i++) {
+                if(i !== index) {
+                    const c = document.getElementById(`card-${i}`);
+                    c.querySelector('.card-back').innerText = fillers[Math.floor(Math.random()*fillers.length)];
+                    c.classList.add('flipped');
+                    c.style.opacity = '0.5';
+                }
+            }
+        }, 800);
+    }
+
+    function revealAll(prize) {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('game-section').style.display = 'block';
+        // 這裡簡單處理：直接全部翻開，中間那格顯示獎項
+        setTimeout(() => {
+            const card = document.getElementById(`card-4`); // 中間那格
+            card.querySelector('.card-back').innerText = prize;
+            card.classList.add('flipped');
+        }, 100);
+    }
+
+    function showResult(prize, isReplay) {
+        const msg = document.getElementById('result-msg');
+        msg.innerHTML = `恭喜 <strong>${currentNickname}</strong> 抽中：<br><h2>${prize}</h2><br><small>📸 請截圖回傳</small>`;
+        msg.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
