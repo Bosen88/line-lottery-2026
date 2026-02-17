@@ -4,61 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2026 馬上有錢新春抽抽樂</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* CSS 樣式維持不變，保持喜氣 */
         :root { --primary-red: #d93025; --primary-gold: #ffd700; }
-        body {
-            font-family: 'Microsoft JhengHei', sans-serif;
-            background-color: var(--primary-red);
-            background-image: radial-gradient(circle, #e64c4c 10%, transparent 10%);
-            background-size: 20px 20px;
-            color: #333;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            text-align: center;
-        }
-        .container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            border: 4px solid var(--primary-gold);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        .horse-deco { font-size: 3rem; margin-bottom: -10px; }
-        h1 { color: var(--primary-red); margin-bottom: 5px; font-weight: 800; font-size: 1.5rem; }
-        .sub-title { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
-        input[type="text"] { width: 80%; padding: 12px; font-size: 1rem; border: 2px solid #ddd; margin-bottom: 15px; text-align: center; border-radius: 8px;}
-        .btn-start { background: var(--primary-red); color: var(--primary-gold); border: none; padding: 12px 30px; font-size: 1.1rem; border-radius: 50px; cursor: pointer; font-weight: bold; }
+        body { font-family: 'Microsoft JhengHei', sans-serif; background: var(--primary-red); color: #333; min-height: 100vh; display: flex; justify-content: center; align-items: center; text-align: center; margin: 0;}
+        .container { background: #fff; padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; border: 5px solid var(--primary-gold); }
+        .horse-deco { font-size: 4rem; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-        .card { background-color: var(--primary-gold); aspect-ratio: 1; border-radius: 8px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.6s; }
+        .card { aspect-ratio: 1; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.6s; }
         .card.flipped { transform: rotateY(180deg); }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; padding: 5px; box-sizing: border-box; }
-        .card-front { background: linear-gradient(135deg, #ffeb3b 0%, #fbc02d 100%); color: #d93025; font-size: 2rem; border: 2px solid #fff; }
-        .card-back { background: #fff; color: #d93025; transform: rotateY(180deg); border: 2px solid var(--primary-gold); font-size: 0.9rem; }
-        .message-box { margin-top: 20px; padding: 10px; background: #ffebee; color: #c62828; border-radius: 8px; font-size: 0.9rem; display: none; }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 10px; padding: 5px; flex-direction: column; }
+        .card-front { background: linear-gradient(135deg, #ffd700, #ffb300); color: #d93025; font-size: 2rem; border: 2px solid #fff; }
+        .card-back { background: #fff; transform: rotateY(180deg); border: 2px solid var(--primary-gold); }
+        .prize-img { max-width: 80%; max-height: 50px; object-fit: contain; margin-bottom: 5px; }
+        .message-box { margin-top: 20px; padding: 15px; background: #fff8e1; border-radius: 15px; border: 2px dashed var(--primary-gold); display: none; }
+        .btn-start { background: linear-gradient(180deg, #ff5252 0%, #d50000 100%); color: white; padding: 12px 30px; border-radius: 50px; border: none; font-size: 1.2rem; cursor: pointer; width: 80%; margin-top: 10px; }
+        input[type="text"] { width: 80%; padding: 12px; font-size: 1.1rem; border: 3px solid #eee; margin-bottom: 10px; text-align: center; border-radius: 50px; }
+        .btn-share { display: inline-block; margin-top: 10px; padding: 8px 20px; background-color: #06c755; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9rem; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="horse-deco">🐎</div>
-    <h1>2026 馬上有錢<br>新春抽抽樂</h1>
-    <p class="sub-title">LINE 購物群友專屬活動</p>
-
+    <h1>2026 馬上有錢</h1>
+    <p>LINE 購物群友專屬活動</p>
     <div id="login-section">
-        <p>請先輸入您的 LINE 暱稱</p>
-        <input type="text" id="nickname" placeholder="例如: 王小明">
-        <br>
-        <button class="btn-start" onclick="checkUser()">開始抽獎</button>
+        <input type="text" id="nickname" placeholder="請輸入 LINE 暱稱">
+        <br><button class="btn-start" onclick="checkUser()">👉 馬上開抽</button>
     </div>
-
     <div id="game-section" style="display:none;">
-        <p>請點擊任意一張牌！</p>
+        <p style="font-weight:bold; color:#d93025;">✨ 請點擊一張發財牌 ✨</p>
         <div class="grid-container" id="grid"></div>
         <div class="message-box" id="result-msg"></div>
     </div>
@@ -66,141 +45,155 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } 
-    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // 🔴🔴 請在此處貼上您從 Firebase Console 複製的設定 🔴🔴
-	const firebaseConfig = {
- 	 apiKey: "AIzaSyD_VwNV9-pcv91aFfcWQWCJ0NJtSIKi42o",
- 	 authDomain: "lottery-2026.firebaseapp.com",
- 	 projectId: "lottery-2026",
-	 storageBucket: "lottery-2026.firebasestorage.app",
-	
- 	 appId: "1:451105292594:web:ca1e74f3e88daae298972b"
-	};
+    // 🔴🔴 請在下面貼上您的 Firebase Config 🔴🔴
+    const firebaseConfig = {
+        apiKey: "AIzaSyD_VwNV9-pcv91aFfcWQWCJ0NJtSIKi42o",
+        authDomain: "lottery-2026.firebaseapp.com",
+        projectId: "lottery-2026",
+        storageBucket: "lottery-2026.firebasestorage.app",
+        messagingSenderId: "451105292594",
+        appId: "1:451105292594:web:ca1e74f3e88daae298972b"
+    };
 
-    // 初始化 Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
     let currentNickname = '';
-    let isProcessing = false;
+    let displayPrizePool = [];
 
     window.checkUser = async function() {
         const input = document.getElementById('nickname').value.trim();
-        if (!input) return alert('請輸入暱稱');
-        
+        if (!input) return alert('請輸入暱稱！');
         currentNickname = input;
-        document.getElementById('login-section').innerHTML = '<p>讀取資料中...</p>';
+        const btn = document.querySelector('.btn-start');
+        btn.innerHTML = '檢查資格中...'; btn.disabled = true;
 
         try {
-            // 檢查是否抽過 (直接用暱稱當 ID，保證唯一)
-            const docRef = doc(db, "participants", currentNickname);
-            const docSnap = await getDoc(docRef);
+            // 抓取顯示用的填充獎項
+            const configSnap = await getDoc(doc(db, "settings", "game_config"));
+            if (configSnap.exists()) { displayPrizePool = configSnap.data().prizes; }
+            else { displayPrizePool = [{name: '大吉大利'}, {name: '恭喜發財'}]; }
 
-            renderGrid(); // 先畫格子
+            // 檢查是否抽過
+            const userRef = doc(db, "participants", currentNickname);
+            const userSnap = await getDoc(userRef);
+            renderGrid();
 
-            if (docSnap.exists()) {
-                // 已抽過 -> 顯示結果
-                const data = docSnap.data();
-                alert(`您已經參加過囉！結果是：${data.prize}`);
-                revealAll(data.prize);
-                showResult(data.prize, true);
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('game-section').style.display = 'block';
+                let dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString('zh-TW') : "時間記錄中...";
+                setTimeout(() => {
+                    alert(`您已抽過囉！\n獎項：${data.prize.name}`);
+                    revealAll(data.prize);
+                    showResult(data.prize, dateStr);
+                }, 500);
             } else {
-                // 沒抽過 -> 進入遊戲模式
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('game-section').style.display = 'block';
             }
         } catch (e) {
-            console.error(e);
-            alert('連線錯誤，請檢查網路');
-            location.reload();
+            console.error(e); alert('連線錯誤，請重試'); location.reload();
         }
     }
 
+    let isProcessing = false;
     window.doDraw = async function(index) {
         if (isProcessing) return;
+        const card = document.getElementById(`card-${index}`);
+        if(card.classList.contains('flipped')) return;
         isProcessing = true;
+        card.style.animation = "shake 0.5s"; // 搖晃特效
 
-        // 定義獎項與機率 (前端邏輯)
-        const prizes = [
-            '獨家代理商品 9折卷', '獨家代理商品 9折卷', '獨家代理商品 95折卷',
-            '馬年行大運', '恭喜發財', '新春大吉', '馬上有錢', '心想事成', '萬事如意'
-        ];
-        // 隨機抽一個
-        const result = prizes[Math.floor(Math.random() * prizes.length)];
+        const configRef = doc(db, "settings", "game_config");
+        const userRef = doc(db, "participants", currentNickname);
 
         try {
-            // 寫入 Firebase (使用 setDoc 寫入，如果暱稱已存在會失敗或覆蓋，
-            // 但因為前面 checkUser 檢查過了，且我們相信 User 只是玩遊戲)
-            // 嚴謹一點可以用 Transaction，但這裡求簡單
-            await setDoc(doc(db, "participants", currentNickname), {
-                prize: result,
-                timestamp: serverTimestamp()
+            const finalResult = await runTransaction(db, async (transaction) => {
+                const configDoc = await transaction.get(configRef);
+                const userDoc = await transaction.get(userRef);
+                if (userDoc.exists()) throw "Played";
+                if (!configDoc.exists()) throw "NoConfig";
+
+                const prizes = configDoc.data().prizes;
+                let validIndices = [];
+                // 根據剩餘數量建立抽獎池
+                prizes.forEach((p, idx) => {
+                    const count = (p.count !== undefined) ? p.count : 0;
+                    for(let i=0; i < count; i++) validIndices.push(idx);
+                });
+
+                if (validIndices.length === 0) throw "SoldOut";
+
+                const rand = Math.floor(Math.random() * validIndices.length);
+                const winnerIndex = validIndices[rand];
+                const winningPrize = prizes[winnerIndex];
+
+                // 扣庫存並寫入
+                prizes[winnerIndex].count--;
+                transaction.update(configRef, { prizes: prizes });
+                transaction.set(userRef, { prize: winningPrize, timestamp: serverTimestamp() });
+                return winningPrize;
             });
 
-            // 成功寫入後，翻牌
-            revealOne(index, result);
-            showResult(result, false);
-
+            const now = new Date();
+            card.style.animation = "";
+            revealOne(index, finalResult);
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            showResult(finalResult, now.toLocaleString('zh-TW'));
         } catch (e) {
-            alert('抽獎發生錯誤，請重試');
-            isProcessing = false;
+            isProcessing = false; card.style.animation = "";
+            if (e === "Played") alert("您已經玩過囉！");
+            else if (e === "SoldOut") alert("所有獎項都已抽完囉！");
+            else alert("系統忙碌中，請再試一次！");
         }
     }
 
     function renderGrid() {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = '';
+        const grid = document.getElementById('grid'); grid.innerHTML = '';
         for(let i=0; i<9; i++) {
-            let card = document.createElement('div');
-            card.className = 'card';
-            card.id = `card-${i}`;
+            let card = document.createElement('div'); card.className = 'card'; card.id = `card-${i}`;
             card.onclick = () => doDraw(i);
-            card.innerHTML = `
-                <div class="card-face card-front">福</div>
-                <div class="card-face card-back">?</div>
-            `;
+            card.innerHTML = `<div class="card-face card-front">福</div><div class="card-face card-back">...</div>`;
             grid.appendChild(card);
         }
     }
 
-    function revealOne(index, prize) {
+    function revealOne(index, prizeData) {
         const card = document.getElementById(`card-${index}`);
-        card.querySelector('.card-back').innerText = prize;
+        const imgHtml = prizeData.img ? `<img src="${prizeData.img}" class="prize-img">` : '';
+        card.querySelector('.card-back').innerHTML = `${imgHtml}<div style="font-weight:900;">${prizeData.name}</div>`;
         card.classList.add('flipped');
-        
-        // 翻開其他的 (隨機填充)
         setTimeout(() => {
-            const fillers = ['恭喜發財', '銘謝惠顧', '再接再厲', '馬年快樂'];
             for(let i=0; i<9; i++) {
                 if(i !== index) {
                     const c = document.getElementById(`card-${i}`);
-                    c.querySelector('.card-back').innerText = fillers[Math.floor(Math.random()*fillers.length)];
-                    c.classList.add('flipped');
-                    c.style.opacity = '0.5';
+                    const randomFill = displayPrizePool[Math.floor(Math.random()*displayPrizePool.length)];
+                    const fillImg = randomFill.img ? `<img src="${randomFill.img}" class="prize-img">` : '';
+                    c.querySelector('.card-back').innerHTML = `${fillImg}<span style="font-size:0.8rem; color:#aaa;">${randomFill.name}</span>`;
+                    c.classList.add('flipped'); c.style.opacity = '0.5'; c.onclick = null;
                 }
             }
-        }, 800);
+        }, 600);
+    }
+    
+    function revealAll(prizeData) {
+        const card = document.getElementById(`card-4`);
+        const imgHtml = prizeData.img ? `<img src="${prizeData.img}" class="prize-img">` : '';
+        card.querySelector('.card-back').innerHTML = `${imgHtml}<div style="font-weight:900;">${prizeData.name}</div>`;
+        card.classList.add('flipped');
     }
 
-    function revealAll(prize) {
-        document.getElementById('login-section').style.display = 'none';
-        document.getElementById('game-section').style.display = 'block';
-        // 這裡簡單處理：直接全部翻開，中間那格顯示獎項
-        setTimeout(() => {
-            const card = document.getElementById(`card-4`); // 中間那格
-            card.querySelector('.card-back').innerText = prize;
-            card.classList.add('flipped');
-        }, 100);
-    }
-
-    function showResult(prize, isReplay) {
+    function showResult(prizeData, timeStr) {
         const msg = document.getElementById('result-msg');
-        msg.innerHTML = `恭喜 <strong>${currentNickname}</strong> 抽中：<br><h2>${prize}</h2><br><small>📸 請截圖回傳</small>`;
+        const shareText = `我在「馬上有錢抽抽樂」抽中了【${prizeData.name}】！`;
+        const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
+        msg.innerHTML = `<div>恭喜 <strong>${currentNickname}</strong> 獲得：</div><h2 style="margin:10px 0; font-size:1.6rem;">${prizeData.name}</h2>${prizeData.img ? `<img src="${prizeData.img}" style="max-width:100px; border-radius:10px;">` : ''}<div style="font-size:0.8rem; color:#666; margin-top:10px; border-top:1px solid #ccc;">📅 ${timeStr}</div><a href="${lineUrl}" target="_blank" class="btn-share">💬 炫耀給朋友看</a><div style="margin-top:10px; color:red; font-size:0.8rem;">📸 請截圖此畫面領獎</div>`;
         msg.style.display = 'block';
     }
 </script>
-
 </body>
 </html>

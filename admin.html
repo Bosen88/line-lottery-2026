@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抽獎活動後台 (庫存版)</title>
+    <style>
+        body { font-family: 'Microsoft JhengHei', sans-serif; padding: 20px; background: #f0f2f5; max-width: 800px; margin: 0 auto; }
+        h1 { color: #333; border-bottom: 2px solid #d93025; padding-bottom: 10px; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center; }
+        input[type="text"] { flex: 2; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        input[type="number"] { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-add { background: #00C851; color: white; }
+        .btn-save { background: #4285F4; color: white; width: 100%; font-size: 1.2rem; margin-top: 10px; }
+        .btn-delete { background: #ff4444; color: white; padding: 5px 10px; font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; }
+        .preview-img { height: 40px; width: 40px; object-fit: cover; border-radius: 4px; background: #eee; }
+        .count-badge { background: #e0e0e0; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <h1>⚙️ 抽獎活動後台 (含庫存設定)</h1>
+    <div class="card">
+        <h3>新增獎項</h3>
+        <div class="input-group">
+            <input type="text" id="newPrizeName" placeholder="獎項名稱 (例如: 限量布偶)">
+            <input type="number" id="newPrizeCount" placeholder="數量" value="1" min="1">
+            <input type="text" id="newPrizeImg" placeholder="圖片連結 URL (選填)">
+            <button class="btn-add" onclick="addPrize()">＋ 新增</button>
+        </div>
+        <small style="color: #666;">💡 數量設為 0 代表該獎項已被抽光。</small>
+    </div>
+    <div class="card">
+        <h3>目前的獎項池</h3>
+        <table>
+            <thead><tr><th>圖片</th><th>名稱</th><th>剩餘數量</th><th>操作</th></tr></thead>
+            <tbody id="prizeTableBody"></tbody>
+        </table>
+        <button class="btn-save" onclick="saveToFirebase()">💾 儲存設定到雲端</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // 🔴🔴 請在下面貼上您的 Firebase Config 🔴🔴
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_VwNV9-pcv91aFfcWQWCJ0NJtSIKi42o",
+            authDomain: "lottery-2026.firebaseapp.com",
+            projectId: "lottery-2026",
+            storageBucket: "lottery-2026.firebasestorage.app",
+            messagingSenderId: "451105292594",
+            appId: "1:451105292594:web:ca1e74f3e88daae298972b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 後台密碼設定 (預設 8888)
+        const password = prompt("請輸入後台密碼", "");
+        if (password !== "8888") {
+            alert("密碼錯誤");
+            document.body.innerHTML = "無權限訪問";
+            throw new Error("Access Denied");
+        }
+
+        let prizeList = [];
+
+        window.loadConfig = async function() {
+            const docRef = doc(db, "settings", "game_config");
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                prizeList = docSnap.data().prizes || [];
+            } else {
+                prizeList = []; // 預設為空
+            }
+            renderTable();
+        }
+
+        window.renderTable = function() {
+            const tbody = document.getElementById('prizeTableBody');
+            tbody.innerHTML = '';
+            prizeList.forEach((item, index) => {
+                const imgDisplay = item.img ? `<img src="${item.img}" class="preview-img">` : '無';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${imgDisplay}</td><td>${item.name}</td><td><span class="count-badge">${item.count}</span></td><td><button class="btn-delete" onclick="removePrize(${index})">刪除</button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.addPrize = function() {
+            const name = document.getElementById('newPrizeName').value.trim();
+            const count = parseInt(document.getElementById('newPrizeCount').value) || 1;
+            const img = document.getElementById('newPrizeImg').value.trim();
+            if(!name) return alert("請輸入獎項名稱");
+            prizeList.push({ name, count, img });
+            renderTable();
+            // 清空輸入框
+            document.getElementById('newPrizeName').value = '';
+            document.getElementById('newPrizeCount').value = '1';
+            document.getElementById('newPrizeImg').value = '';
+        }
+
+        window.removePrize = function(index) {
+            prizeList.splice(index, 1);
+            renderTable();
+        }
+
+        window.saveToFirebase = async function() {
+            if(prizeList.length < 1) return alert("至少要有一個獎項！");
+            if(!confirm("確定要儲存嗎？這會更新前台的獎項庫存。")) return;
+            try {
+                await setDoc(doc(db, "settings", "game_config"), { prizes: prizeList });
+                alert("✅ 設定已更新成功！");
+            } catch (e) {
+                console.error(e);
+                alert("儲存失敗");
+            }
+        }
+        loadConfig();
+    </script>
+</body>
+</html>
