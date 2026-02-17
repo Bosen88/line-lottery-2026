@@ -2,52 +2,311 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 馬上有錢新春抽抽樂</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2026 金蛇迎春・馬上有錢</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&family=Roboto:wght@900&display=swap" rel="stylesheet">
     <style>
-        :root { --primary-red: #d93025; --primary-gold: #ffd700; }
-        body { font-family: 'Microsoft JhengHei', sans-serif; background: var(--primary-red); color: #333; min-height: 100vh; display: flex; justify-content: center; align-items: center; text-align: center; margin: 0;}
-        .container { background: #fff; padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; border: 5px solid var(--primary-gold); }
-        .horse-deco { font-size: 4rem; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-        .card { aspect-ratio: 1; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.6s; }
-        .card.flipped { transform: rotateY(180deg); }
-        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 10px; padding: 5px; flex-direction: column; }
-        .card-front { background: linear-gradient(135deg, #ffd700, #ffb300); color: #d93025; font-size: 2rem; border: 2px solid #fff; }
-        .card-back { background: #fff; transform: rotateY(180deg); border: 2px solid var(--primary-gold); }
-        .prize-img { max-width: 80%; max-height: 50px; object-fit: contain; margin-bottom: 5px; }
-        .message-box { margin-top: 20px; padding: 15px; background: #fff8e1; border-radius: 15px; border: 2px dashed var(--primary-gold); display: none; }
-        .btn-start { background: linear-gradient(180deg, #ff5252 0%, #d50000 100%); color: white; padding: 12px 30px; border-radius: 50px; border: none; font-size: 1.2rem; cursor: pointer; width: 80%; margin-top: 10px; }
-        input[type="text"] { width: 80%; padding: 12px; font-size: 1.1rem; border: 3px solid #eee; margin-bottom: 10px; text-align: center; border-radius: 50px; }
-        .btn-share { display: inline-block; margin-top: 10px; padding: 8px 20px; background-color: #06c755; color: white; text-decoration: none; border-radius: 5px; font-size: 0.9rem; }
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 60% { transform: translate(-3px, 1px) rotate(0deg); } 80% { transform: translate(-1px, -1px) rotate(1deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); }
+        :root {
+            --bg-dark: #2b0a0d;
+            --bg-red: #8E0E00;
+            --gold-light: #fff3b0;
+            --gold-dark: #ca8a04;
+            --card-red: #d90429;
         }
+
+        body {
+            font-family: 'Noto Serif TC', serif;
+            background: radial-gradient(circle at center, var(--bg-red), var(--bg-dark));
+            color: #fff;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 背景飄浮粒子動畫 */
+        .bg-pattern {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(#ffd700 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.1;
+            z-index: -1;
+            animation: floatUp 20s linear infinite;
+        }
+        @keyframes floatUp { from { background-position: 0 0; } to { background-position: 0 -100px; } }
+
+        .container {
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            z-index: 1;
+            padding-bottom: 30px;
+        }
+
+        /* 標題區 */
+        .header {
+            margin-bottom: 20px;
+            animation: slideDown 0.8s ease-out;
+        }
+        .main-title {
+            font-size: 2.8rem;
+            margin: 0;
+            background: linear-gradient(to bottom, #fff7d6, #ffd700, #b8860b);
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            letter-spacing: 2px;
+        }
+        .sub-title {
+            color: #ffcccc;
+            font-size: 1rem;
+            margin-top: 5px;
+            font-weight: normal;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        /* 輸入與按鈕區 */
+        .login-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: zoomIn 0.5s ease-out;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid #b8860b;
+            background: rgba(0, 0, 0, 0.3);
+            color: #ffd700;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
+        }
+        input[type="text"]:focus {
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-gold {
+            background: linear-gradient(180deg, #ffd700 0%, #ffb900 100%);
+            color: #8E0E00;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 185, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .btn-gold:active { transform: scale(0.95); }
+        .btn-gold::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        /* 九宮格區 */
+        #game-section { display: none; }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 20px auto;
+            perspective: 1000px;
+        }
+
+        .card {
+            aspect-ratio: 1;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            cursor: pointer;
+        }
+        
+        /* 呼吸燈效果 */
+        .card:not(.flipped) {
+            animation: pulse 2s infinite ease-in-out;
+        }
+        
+        .card.flipped { transform: rotateY(180deg); animation: none; }
+        
+        /* 選中時的震動 */
+        .card.shaking { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both !important; }
+
+        .card-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 2px solid #ffd700; 
+        }
+
+        .card-front {
+            background: linear-gradient(145deg, #d00000, #990000);
+            /* 紅包質感 */
+        }
+        
+        /* 正面的福字 */
+        .fu-text {
+            font-size: 3rem;
+            font-family: 'STKaiti', 'KaiTi', serif; /* 楷體 */
+            background: linear-gradient(to bottom, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            color: transparent;
+            border: 2px solid #ffd700;
+            border-radius: 50%;
+            width: 60px; height: 60px;
+            line-height: 60px;
+            display: block;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .card-back {
+            background: #fff;
+            transform: rotateY(180deg);
+            color: #333;
+            padding: 5px;
+        }
+        
+        /* 中獎卡片特效 */
+        .card.winner .card-back {
+            border: 4px solid #ffd700;
+            box-shadow: 0 0 20px #ffd700;
+        }
+
+        .prize-img {
+            width: 100%;
+            height: 60%;
+            object-fit: contain;
+            margin-bottom: 5px;
+        }
+        .prize-name {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #8E0E00;
+            line-height: 1.2;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        /* 結果通知 */
+        .result-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 99;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        .result-modal.show { opacity: 1; pointer-events: auto; }
+        
+        .result-content {
+            background: white;
+            width: 85%; max-width: 350px;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            color: #333;
+            border: 4px solid #ffd700;
+            animation: popUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+        
+        /* 光芒背景 */
+        .rays {
+            position: absolute; top: 50%; left: 50%;
+            width: 500px; height: 500px;
+            background: repeating-conic-gradient(from 0deg, rgba(255, 215, 0, 0.2) 0deg 20deg, transparent 20deg 40deg);
+            transform: translate(-50%, -50%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .btn-share {
+            background: #06c755; color: white;
+            text-decoration: none; padding: 12px 30px;
+            border-radius: 50px; display: inline-block;
+            margin-top: 15px; font-weight: bold;
+            box-shadow: 0 4px 0 #059f44;
+        }
+
+        /* Animations */
+        @keyframes shine { 0% { left: -100%; } 20% { left: 100%; } 100% { left: 100%; } }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); } 50% { transform: scale(1.02); box-shadow: 0 0 20px rgba(255,215,0,0.4); } 100% { transform: scale(1); } }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 10%, 30%, 50%, 70%, 90% {transform: translateX(-3px) rotate(-2deg);} 20%, 40%, 60%, 80% {transform: translateX(3px) rotate(2deg);} }
+        @keyframes popUp { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
     </style>
 </head>
 <body>
+
+<div class="bg-pattern"></div>
+
 <div class="container">
-    <div class="horse-deco">🐎</div>
-    <h1>2026 馬上有錢</h1>
-    <p>LINE 購物群友專屬活動</p>
-    <div id="login-section">
-        <input type="text" id="nickname" placeholder="請輸入 LINE 暱稱">
-        <br><button class="btn-start" onclick="checkUser()">👉 馬上開抽</button>
+    <div class="header">
+        <div style="font-size: 4rem; margin-bottom: -10px; filter: drop-shadow(0 0 10px gold);">🐍</div>
+        <h1 class="main-title">馬上有錢</h1>
+        <p class="sub-title">2026 新春 LINE 群友限定抽抽樂</p>
     </div>
-    <div id="game-section" style="display:none;">
-        <p style="font-weight:bold; color:#d93025;">✨ 請點擊一張發財牌 ✨</p>
+
+    <div id="login-section" class="login-box">
+        <input type="text" id="nickname" placeholder="請輸入您的 LINE 暱稱">
+        <button class="btn-gold" onclick="checkUser()">🧧 試試手氣 🧧</button>
+    </div>
+
+    <div id="game-section">
+        <p style="color: #ffd700; font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); margin-bottom: 10px;">✨ 請憑直覺選一張金牌 ✨</p>
         <div class="grid-container" id="grid"></div>
-        <div class="message-box" id="result-msg"></div>
+    </div>
+</div>
+
+<div id="result-modal" class="result-modal">
+    <div class="rays"></div>
+    <div class="result-content">
+        <h2 style="color:#d90429; margin:0;">🎉 恭喜中獎 🎉</h2>
+        <div id="modal-body" style="margin: 20px 0;">
+            </div>
+        <p style="font-size:0.8rem; color:#888;">截圖此畫面領獎</p>
+        <a href="#" id="share-btn" class="btn-share" target="_blank">💬 炫耀給朋友看</a>
+        <br>
+        <button onclick="closeModal()" style="background:transparent; border:none; color:#999; margin-top:15px; cursor:pointer;">關閉</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, runTransaction, serverTimestamp } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // 🔴🔴 請在下面貼上您的 Firebase Config 🔴🔴
+    // 🔴🔴 請貼上您的 Firebase Config 🔴🔴
     const firebaseConfig = {
         apiKey: "AIzaSyD_VwNV9-pcv91aFfcWQWCJ0NJtSIKi42o",
         authDomain: "lottery-2026.firebaseapp.com",
@@ -61,66 +320,90 @@
     const db = getFirestore(app);
 
     let currentNickname = '';
-    let displayPrizePool = [];
+    let configPrizePool = []; // 完整的獎項設定(含圖片)
 
+    // 初始化：進入遊戲
     window.checkUser = async function() {
         const input = document.getElementById('nickname').value.trim();
-        if (!input) return alert('請輸入暱稱！');
+        if (!input) return alert('請輸入暱稱，財神爺才找得到您！');
         currentNickname = input;
-        const btn = document.querySelector('.btn-start');
-        btn.innerHTML = '檢查資格中...'; btn.disabled = true;
+        
+        const btn = document.querySelector('.btn-gold');
+        btn.innerHTML = '🔮 運勢計算中...';
+        btn.disabled = true;
 
         try {
-            // 抓取顯示用的填充獎項
+            // 1. 抓取設定 (為了後面的 Show Hand 做準備)
             const configSnap = await getDoc(doc(db, "settings", "game_config"));
-            if (configSnap.exists()) { displayPrizePool = configSnap.data().prizes; }
-            else { displayPrizePool = [{name: '大吉大利'}, {name: '恭喜發財'}]; }
+            if (configSnap.exists()) {
+                configPrizePool = configSnap.data().prizes;
+            } else {
+                configPrizePool = [{name: '恭喜發財', img:''}, {name: '大吉大利', img:''}];
+            }
 
-            // 檢查是否抽過
+            // 2. 檢查使用者狀態
             const userRef = doc(db, "participants", currentNickname);
             const userSnap = await getDoc(userRef);
-            renderGrid();
+
+            renderGrid(); // 繪製 9 宮格
 
             if (userSnap.exists()) {
+                // 已玩過
                 const data = userSnap.data();
+                const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString('zh-TW') : "";
+                
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('game-section').style.display = 'block';
-                let dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString('zh-TW') : "時間記錄中...";
+                
                 setTimeout(() => {
-                    alert(`您已抽過囉！\n獎項：${data.prize.name}`);
-                    revealAll(data.prize);
-                    showResult(data.prize, dateStr);
+                    alert('您已經抽過囉！直接為您顯示結果。');
+                    revealAll(data.prize, true); // true 代表是回放
+                    showModal(data.prize, dateStr);
                 }, 500);
             } else {
+                // 沒玩過，開始遊戲
                 document.getElementById('login-section').style.display = 'none';
                 document.getElementById('game-section').style.display = 'block';
+                // 進場小特效
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#ffd700', '#d90429'] });
             }
+
         } catch (e) {
-            console.error(e); alert('連線錯誤，請重試'); location.reload();
+            console.error(e);
+            alert('連線忙碌中，請重新整理頁面');
+            btn.disabled = false;
+            btn.innerHTML = '🧧 試試手氣 🧧';
         }
     }
 
     let isProcessing = false;
+
+    // 點擊卡片
     window.doDraw = async function(index) {
         if (isProcessing) return;
         const card = document.getElementById(`card-${index}`);
         if(card.classList.contains('flipped')) return;
+
         isProcessing = true;
-        card.style.animation = "shake 0.5s"; // 搖晃特效
+        // 1. 劇烈震動效果
+        card.classList.add('shaking');
 
         const configRef = doc(db, "settings", "game_config");
         const userRef = doc(db, "participants", currentNickname);
 
         try {
+            // 2. 執行交易抽獎
             const finalResult = await runTransaction(db, async (transaction) => {
                 const configDoc = await transaction.get(configRef);
                 const userDoc = await transaction.get(userRef);
+                
                 if (userDoc.exists()) throw "Played";
                 if (!configDoc.exists()) throw "NoConfig";
 
                 const prizes = configDoc.data().prizes;
+                
+                // 根據庫存建立抽獎池
                 let validIndices = [];
-                // 根據剩餘數量建立抽獎池
                 prizes.forEach((p, idx) => {
                     const count = (p.count !== undefined) ? p.count : 0;
                     for(let i=0; i < count; i++) validIndices.push(idx);
@@ -128,72 +411,167 @@
 
                 if (validIndices.length === 0) throw "SoldOut";
 
+                // 隨機抽出
                 const rand = Math.floor(Math.random() * validIndices.length);
                 const winnerIndex = validIndices[rand];
                 const winningPrize = prizes[winnerIndex];
 
-                // 扣庫存並寫入
+                // 扣庫存
                 prizes[winnerIndex].count--;
                 transaction.update(configRef, { prizes: prizes });
                 transaction.set(userRef, { prize: winningPrize, timestamp: serverTimestamp() });
+                
                 return winningPrize;
             });
 
+            // 3. 抽獎成功，開始表演
             const now = new Date();
-            card.style.animation = "";
-            revealOne(index, finalResult);
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            showResult(finalResult, now.toLocaleString('zh-TW'));
+            
+            // 停止震動
+            setTimeout(() => {
+                card.classList.remove('shaking');
+                // 翻開中獎卡片
+                flipCard(index, finalResult, true); // true = winner
+                
+                // 放煙火
+                playFireworks();
+                
+                // 彈出視窗
+                setTimeout(() => {
+                    showModal(finalResult, now.toLocaleString('zh-TW'));
+                    // 🔴 關鍵功能：延遲 1 秒後，翻開其他格子 Show Hand
+                    setTimeout(() => revealOthers(index), 1000); 
+                }, 800);
+            }, 1000); // 讓它震動 1 秒
+
         } catch (e) {
-            isProcessing = false; card.style.animation = "";
-            if (e === "Played") alert("您已經玩過囉！");
-            else if (e === "SoldOut") alert("所有獎項都已抽完囉！");
+            isProcessing = false;
+            card.classList.remove('shaking');
+            if (e === "Played") alert("每人只能抽一次喔！");
+            else if (e === "SoldOut") alert("太搶手了！獎項已全數抽完！");
             else alert("系統忙碌中，請再試一次！");
         }
     }
 
+    // 繪製格子
     function renderGrid() {
-        const grid = document.getElementById('grid'); grid.innerHTML = '';
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
         for(let i=0; i<9; i++) {
-            let card = document.createElement('div'); card.className = 'card'; card.id = `card-${i}`;
+            let card = document.createElement('div');
+            card.className = 'card';
+            card.id = `card-${i}`;
             card.onclick = () => doDraw(i);
-            card.innerHTML = `<div class="card-face card-front">福</div><div class="card-face card-back">...</div>`;
+            card.innerHTML = `
+                <div class="card-face card-front">
+                    <span class="fu-text">福</span>
+                </div>
+                <div class="card-face card-back">
+                    </div>
+            `;
             grid.appendChild(card);
         }
     }
 
-    function revealOne(index, prizeData) {
+    // 翻單張牌
+    function flipCard(index, data, isWinner) {
         const card = document.getElementById(`card-${index}`);
-        const imgHtml = prizeData.img ? `<img src="${prizeData.img}" class="prize-img">` : '';
-        card.querySelector('.card-back').innerHTML = `${imgHtml}<div style="font-weight:900;">${prizeData.name}</div>`;
+        const back = card.querySelector('.card-back');
+        
+        let imgHtml = data.img ? `<img src="${data.img}" class="prize-img">` : '';
+        // 如果沒圖片，顯示一個福袋圖示代替(選填)
+        if(!data.img) imgHtml = '<div style="font-size:2rem;">🎁</div>';
+
+        back.innerHTML = `${imgHtml}<div class="prize-name">${data.name}</div>`;
+        
         card.classList.add('flipped');
-        setTimeout(() => {
-            for(let i=0; i<9; i++) {
-                if(i !== index) {
-                    const c = document.getElementById(`card-${i}`);
-                    const randomFill = displayPrizePool[Math.floor(Math.random()*displayPrizePool.length)];
-                    const fillImg = randomFill.img ? `<img src="${randomFill.img}" class="prize-img">` : '';
-                    c.querySelector('.card-back').innerHTML = `${fillImg}<span style="font-size:0.8rem; color:#aaa;">${randomFill.name}</span>`;
-                    c.classList.add('flipped'); c.style.opacity = '0.5'; c.onclick = null;
-                }
-            }
-        }, 600);
-    }
-    
-    function revealAll(prizeData) {
-        const card = document.getElementById(`card-4`);
-        const imgHtml = prizeData.img ? `<img src="${prizeData.img}" class="prize-img">` : '';
-        card.querySelector('.card-back').innerHTML = `${imgHtml}<div style="font-weight:900;">${prizeData.name}</div>`;
-        card.classList.add('flipped');
+        if(isWinner) card.classList.add('winner');
     }
 
-    function showResult(prizeData, timeStr) {
-        const msg = document.getElementById('result-msg');
-        const shareText = `我在「馬上有錢抽抽樂」抽中了【${prizeData.name}】！`;
-        const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
-        msg.innerHTML = `<div>恭喜 <strong>${currentNickname}</strong> 獲得：</div><h2 style="margin:10px 0; font-size:1.6rem;">${prizeData.name}</h2>${prizeData.img ? `<img src="${prizeData.img}" style="max-width:100px; border-radius:10px;">` : ''}<div style="font-size:0.8rem; color:#666; margin-top:10px; border-top:1px solid #ccc;">📅 ${timeStr}</div><a href="${lineUrl}" target="_blank" class="btn-share">💬 炫耀給朋友看</a><div style="margin-top:10px; color:red; font-size:0.8rem;">📸 請截圖此畫面領獎</div>`;
-        msg.style.display = 'block';
+    // 🔴 關鍵功能：翻開其他格子 (Show Hand)
+    function revealOthers(winnerIndex) {
+        // 1. 先建立一個「假」的抽獎池，用來顯示在其他格子上
+        // 為了讓畫面豐富，我們從設定檔裡隨機抓取獎項，假裝是這些位置原本的獎品
+        let dummyPool = [...configPrizePool];
+        
+        // 稍微打亂順序
+        dummyPool.sort(() => Math.random() - 0.5);
+
+        let delay = 0;
+        let poolIndex = 0;
+
+        for(let i=0; i<9; i++) {
+            if(i === winnerIndex) continue; // 跳過中獎那格
+
+            // 取出一個獎品來顯示 (如果池子不夠就循環用)
+            const dummyPrize = dummyPool[poolIndex % dummyPool.length];
+            poolIndex++;
+
+            // 逐一翻開 (Cascade effect)
+            setTimeout(() => {
+                const card = document.getElementById(`card-${i}`);
+                
+                // 視覺上淡化，表示這不是你抽到的
+                card.style.opacity = '0.6';
+                card.onclick = null; // 移除點擊
+                
+                flipCard(i, dummyPrize, false);
+            }, delay);
+            
+            delay += 150; // 每張間隔 0.15 秒
+        }
+    }
+
+    // 給已中獎的人回放看
+    function revealAll(myPrize, isReplay) {
+        // 預設中間那格是中獎的 (或者隨機一格)
+        const targetIndex = 4;
+        flipCard(targetIndex, myPrize, true);
+        
+        // 翻開其他的
+        revealOthers(targetIndex);
+    }
+
+    // 顯示結果彈窗
+    function showModal(data, timeStr) {
+        const modal = document.getElementById('result-modal');
+        const body = document.getElementById('modal-body');
+        const shareBtn = document.getElementById('share-btn');
+        
+        let imgHtml = data.img ? `<img src="${data.img}" style="max-width:150px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.2);">` : '';
+        
+        body.innerHTML = `
+            ${imgHtml}
+            <h3 style="font-size:1.5rem; margin:15px 0; color:#333;">${data.name}</h3>
+            <div style="background:#f5f5f5; padding:5px; border-radius:5px; font-size:0.8rem; color:#666;">
+                中獎時間：${timeStr}
+            </div>
+        `;
+
+        const shareText = `我在「2026馬上有錢」抽中了【${data.name}】！其他獎項也都開出來了，真的有大獎！`;
+        shareBtn.href = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
+        
+        modal.classList.add('show');
+    }
+
+    window.closeModal = function() {
+        document.getElementById('result-modal').classList.remove('show');
+    }
+
+    function playFireworks() {
+        var duration = 3 * 1000;
+        var animationEnd = Date.now() + duration;
+        var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 999 };
+        
+        var interval = setInterval(function() {
+            var timeLeft = animationEnd - Date.now();
+            if (timeLeft <= 0) return clearInterval(interval);
+            var particleCount = 50 * (timeLeft / duration);
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random() - 0.2, y: Math.random() - 0.2 } }));
+            confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random() + 0.2, y: Math.random() - 0.2 } }));
+        }, 250);
     }
 </script>
+
 </body>
 </html>
