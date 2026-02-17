@@ -32,7 +32,6 @@
 
         .bg-pattern {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            /* 將背景圖案改為類似銅錢或元寶的點綴 */
             background-image: radial-gradient(circle, #ffd700 10%, transparent 10%), radial-gradient(circle, #ffd700 10%, transparent 10%);
             background-position: 0 0, 25px 25px;
             background-size: 50px 50px;
@@ -43,75 +42,39 @@
         @keyframes floatUp { from { background-position: 0 0, 25px 25px; } to { background-position: 0 -100px, 25px -75px; } }
 
         .container {
-            width: 95%;
-            max-width: 450px;
-            text-align: center;
-            z-index: 1;
-            padding-bottom: 30px;
+            width: 95%; max-width: 450px; text-align: center; z-index: 1; padding-bottom: 30px;
         }
 
-        /* --- 新增：馬年 Header 樣式 --- */
+        /* Header Style */
         .header-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 25px;
-            position: relative;
-            animation: slideDown 0.8s ease-out;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 25px; position: relative; animation: slideDown 0.8s ease-out;
         }
-
-        .title-block {
-            flex: 1;
-            z-index: 2;
-        }
-
+        .title-block { flex: 1; z-index: 2; }
         .main-title {
             font-size: 2.4rem; margin: 0;
             background: linear-gradient(to bottom, #fff7d6, #ffd700, #b8860b);
             -webkit-background-clip: text; color: transparent;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.5); letter-spacing: 1px;
-            line-height: 1.2;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5); letter-spacing: 1px; line-height: 1.2;
         }
         .sub-title { color: #ffcccc; font-size: 0.9rem; margin-top: 5px; opacity: 0.9; letter-spacing: 1px; }
 
-        /* 卡通馬插圖樣式 */
+        /* Horse Animation */
         .horse-mascot {
-            width: 90px; /* 可自行調整大小 */
-            height: auto;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4));
-            z-index: 1;
+            width: 90px; height: auto; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4)); z-index: 1;
         }
-        
-        .horse-left {
-            animation: bounceSlowLeft 4s infinite ease-in-out;
-            margin-right: -15px; /* 讓馬稍微疊在標題上 */
-        }
-        
-        .horse-right {
-            animation: bounceSlowRight 4s infinite ease-in-out;
-            animation-delay: 2s; /* 錯開動畫時間 */
-            margin-left: -15px;
-            transform: scaleX(-1); /* 水平翻轉，讓馬面對標題 */
-        }
+        .horse-left { animation: bounceSlowLeft 4s infinite ease-in-out; margin-right: -15px; }
+        .horse-right { animation: bounceSlowRight 4s infinite ease-in-out; animation-delay: 2s; margin-left: -15px; transform: scaleX(-1); }
+        @keyframes bounceSlowLeft { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-15px) rotate(2deg); } }
+        @keyframes bounceSlowRight { 0%, 100% { transform: scaleX(-1) translateY(0) rotate(2deg); } 50% { transform: scaleX(-1) translateY(-15px) rotate(-2deg); } }
 
-        @keyframes bounceSlowLeft {
-            0%, 100% { transform: translateY(0) rotate(-2deg); }
-            50% { transform: translateY(-15px) rotate(2deg); }
-        }
-        /* 右邊的馬因為有 scaleX(-1)，旋轉角度要反過來 */
-        @keyframes bounceSlowRight {
-            0%, 100% { transform: scaleX(-1) translateY(0) rotate(2deg); }
-            50% { transform: scaleX(-1) translateY(-15px) rotate(-2deg); }
-        }
-        /* --------------------------- */
-
+        /* Login Box */
         .login-box {
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
             padding: 25px; border-radius: 20px;
             border: 1px solid rgba(255, 215, 0, 0.3);
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            animation: zoomIn 0.5s ease-out;
-            width: 90%; margin: 0 auto;
+            animation: zoomIn 0.5s ease-out; width: 90%; margin: 0 auto;
         }
 
         input[type="text"] {
@@ -137,12 +100,12 @@
             transform: rotate(45deg); animation: shine 3s infinite;
         }
 
+        /* Game Grid */
         #game-section { display: none; }
         .grid-container {
             display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 12px; margin: 20px auto; perspective: 1000px;
         }
-
         .card {
             aspect-ratio: 1; position: relative; transform-style: preserve-3d;
             transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); cursor: pointer;
@@ -150,13 +113,11 @@
         .card:not(.flipped) { animation: pulse 2s infinite ease-in-out; }
         .card.flipped { transform: rotateY(180deg); animation: none; }
         .card.shaking { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both !important; }
-
         .card-face {
             position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 2px solid #ffd700; 
         }
-
         .card-front { background: linear-gradient(145deg, #d00000, #990000); }
         .fu-text {
             font-size: 3rem; font-family: 'STKaiti', 'KaiTi', serif;
@@ -166,16 +127,41 @@
             width: 60px; height: 60px; line-height: 60px;
             display: block; box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
         }
-
         .card-back { background: #fff; transform: rotateY(180deg); color: #333; padding: 5px; }
         .card.winner .card-back { border: 4px solid #ffd700; box-shadow: 0 0 20px #ffd700; }
-
         .prize-img { width: 100%; height: 60%; object-fit: contain; margin-bottom: 5px; }
         .prize-name {
             font-size: 0.9rem; font-weight: bold; color: #8E0E00; line-height: 1.2;
             overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
         }
 
+        /* --- 新增：規則說明彈窗樣式 --- */
+        .rules-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 999;
+            display: flex; justify-content: center; align-items: center;
+            animation: fadeIn 0.5s;
+        }
+        .rules-content {
+            background: #fff; width: 85%; max-width: 400px;
+            border-radius: 15px; padding: 25px;
+            border: 4px solid #ffd700;
+            text-align: left;
+            position: relative;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+        .rules-title {
+            text-align: center; font-size: 1.5rem; color: #d90429;
+            margin-top: 0; margin-bottom: 15px; border-bottom: 2px dashed #ddd; padding-bottom: 10px;
+        }
+        .rules-list {
+            font-size: 0.95rem; color: #333; line-height: 1.6;
+            margin-bottom: 20px; max-height: 60vh; overflow-y: auto;
+        }
+        .rules-list strong { color: #d90429; }
+        .rules-list li { margin-bottom: 8px; }
+
+        /* 結果彈窗樣式 (共用) */
         .result-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center;
@@ -194,13 +180,13 @@
             transform: translate(-50%, -50%); animation: rotate 20s linear infinite;
             z-index: -1; pointer-events: none;
         }
-
         .btn-share {
             background: #06c755; color: white; text-decoration: none;
             padding: 12px 30px; border-radius: 50px; display: inline-block;
             margin-top: 15px; font-weight: bold; box-shadow: 0 4px 0 #059f44;
         }
 
+        /* Animations */
         @keyframes shine { 0% { left: -100%; } 20% { left: 100%; } 100% { left: 100%; } }
         @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); } 50% { transform: scale(1.02); box-shadow: 0 0 20px rgba(255,215,0,0.4); } 100% { transform: scale(1); } }
         @keyframes shake { 0%, 100% {transform: translateX(0);} 10%, 30%, 50%, 70%, 90% {transform: translateX(-3px) rotate(-2deg);} 20%, 40%, 60%, 80% {transform: translateX(3px) rotate(2deg);} }
@@ -208,6 +194,7 @@
         @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
         @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     </style>
 </head>
@@ -215,15 +202,30 @@
 
 <div class="bg-pattern"></div>
 
+<div id="rules-modal" class="rules-modal">
+    <div class="rules-content">
+        <h2 class="rules-title">📜 活動規則說明</h2>
+        <div class="rules-list">
+            <ol style="padding-left: 20px; margin: 0;">
+                <li><strong>⏰ 活動期間</strong><br>2026/2/17(二) ~ 2/22(日) 23:59止。</li>
+                <li><strong>👤 實名機制</strong><br>暱稱務必使用「<strong>Karen🛍️BUY寶箱放心購 🛍️</strong>」內相同姓名，一人僅一次機會。</li>
+                <li><strong>🎫 兌獎期限</strong><br>優惠卷/折價卷/分享包使用期限至 <strong>2026/12/31</strong> 止，逾期無效。</li>
+                <li><strong>📸 領獎憑證</strong><br>中獎畫面請務必<strong>截圖回傳群組</strong>，無截圖者恕不補發。</li>
+                <li><strong>👨‍👩‍👧‍👦 好康道相報</strong><br>歡迎邀約親朋好友入群，一起馬上有錢！</li>
+                <li><strong>⚠️ 注意事項</strong><br>Karen保留隨時修改、變更、暫停或終止本活動內容之權利。</li>
+            </ol>
+        </div>
+        <button class="btn-gold" onclick="closeRules()">我瞭解了，開始遊戲</button>
+    </div>
+</div>
+
 <div class="container">
     <div class="header-container">
         <img src="https://i.postimg.cc/HncnQz75/IMG_6138.png" class="horse-mascot horse-left" alt="卡通馬左">
-        
         <div class="title-block">
             <h1 class="main-title">2026<br>馬上有錢</h1>
             <p class="sub-title">新春 LINE 群友限定抽抽樂</p>
         </div>
-
         <img src="https://i.postimg.cc/8c60VcC2/IMG_6140.jpg" class="horse-mascot horse-right" alt="卡通馬右">
     </div>
 
@@ -257,19 +259,28 @@
 
     // 🔴🔴 請在此貼上您的 Firebase Config 🔴🔴
     const firebaseConfig = {
-                    apiKey: "AIzaSyD_VwNV9-pcv91aFfcWQWCJ0NJtSIKi42o",
+            apiKey: "AIzaSyD_VwNV9-pcv91aFfcWQWCJ0NJtSIKi42o",
             authDomain: "lottery-2026.firebaseapp.com",
             projectId: "lottery-2026",
             storageBucket: "lottery-2026.firebasestorage.app",
             messagingSenderId: "451105292594",
-            appId: "1:451105292594:web:ca1e74f3e88daae298972b"    
-        };
+            appId: "1:451105292594:web:ca1e74f3e88daae298972b"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
     let currentNickname = '';
     let configPrizePool = []; 
+
+    // 關閉規則視窗的函式
+    window.closeRules = function() {
+        const modal = document.getElementById('rules-modal');
+        modal.style.opacity = '0';
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 500);
+    }
 
     window.checkUser = async function() {
         const input = document.getElementById('nickname').value.trim();
@@ -280,12 +291,10 @@
         btn.innerHTML = '🔮 運勢計算中...'; btn.disabled = true;
 
         try {
-            // 讀取設定，若為空則給預設值
             const configSnap = await getDoc(doc(db, "settings", "game_config"));
             if (configSnap.exists() && configSnap.data().prizes && configSnap.data().prizes.length > 0) {
                 configPrizePool = configSnap.data().prizes;
             } else {
-                // 這裡的圖片也可以換成馬年的吉祥話圖片
                 configPrizePool = [{name: '馬到成功', img:''}, {name: '恭喜發財', img:''}, {name: '萬事如意', img:''}];
             }
 
@@ -358,7 +367,6 @@
                 flipCard(index, finalResult, true); 
                 playFireworks();
                 
-                // 彈出結果
                 setTimeout(() => {
                     showModal(finalResult, now.toLocaleString('zh-TW'));
                     try { setTimeout(() => revealOthers(index), 1000); } catch(err) { console.log(err); }
@@ -388,7 +396,6 @@
         const card = document.getElementById(`card-${index}`);
         const back = card.querySelector('.card-back');
         let imgHtml = data.img ? `<img src="${data.img}" class="prize-img">` : '<div style="font-size:2rem;">🎁</div>';
-        // 預設文字改為馬年吉祥話
         back.innerHTML = `${imgHtml}<div class="prize-name">${data.name || '馬到成功'}</div>`;
         card.classList.add('flipped');
         if(isWinner) card.classList.add('winner');
@@ -397,8 +404,7 @@
     function revealOthers(winnerIndex) {
         let dummyPool = (configPrizePool && configPrizePool.length > 0) 
             ? [...configPrizePool] 
-            // 預設填充改為馬年吉祥話
-            : [{name:'馬到成功'}, {name:'金馬奔騰'}, {name:'恭喜發財'}, {name:'步步高升'}];
+            : [{name:'馬到成功'}, {name:'金馬有錢'}, {name:'恭喜發財'}, {name:'馬上有錢'}];
         
         dummyPool.sort(() => Math.random() - 0.5);
         let delay = 0;
@@ -431,7 +437,7 @@
         const shareBtn = document.getElementById('share-btn');
         let imgHtml = data.img ? `<img src="${data.img}" style="max-width:150px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.2);">` : '';
         body.innerHTML = `${imgHtml}<h3 style="font-size:1.5rem; margin:15px 0; color:#333;">${data.name}</h3><div style="background:#f5f5f5; padding:5px; border-radius:5px; font-size:0.8rem; color:#666;">中獎時間：${timeStr}</div>`;
-        const shareText = `我在「2026馬上有錢」抽中了【${data.name}】！其他獎項也都開出來了，真的有大獎！`;
+        const shareText = `我在「2026馬上有錢」抽中了【${data.name}】！`;
         shareBtn.href = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
         modal.classList.add('show');
     }
